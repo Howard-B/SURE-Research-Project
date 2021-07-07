@@ -165,7 +165,7 @@ server <- function(input, output) {
     return (lambda)
   }
   
-  # Constructs a prior probability distribution for the treatment effect rho
+  # Constructs a prior probability distribution for the treatment effect rho ----
   output$pdf_rho <- renderPlot ({
     p <- string_to_num_vector(input$cumulative_probs)
     v <- string_to_num_vector(input$treat_effect)
@@ -194,41 +194,65 @@ server <- function(input, output) {
   
   
   
-   
-    # Constructs a prior probability distribution for the treatment effect rho
-    output$cdf_rho <- renderPlot ({
-      p <- string_to_num_vector(input$cumulative_probs)
-      v <- string_to_num_vector(input$treat_effect)
-      
-      params <- SHELF::fitdist(vals = v, probs = p)$Normal
+  # Fit distribution to elicited judgements for rho ----
+  
+  
+  pRho <-  reactive({
+    string_to_num_vector(input$cumulative_probs)
+    })
+  
+  vRho <- reactive({
+    string_to_num_vector(input$treat_effect)
+    })
+  
+  domain <- reactive({
+    string_to_num_vector(input$domain)
+  })
+  
+  distributionRho <- reactive({
+    SHELF::fitdist(vals = vRho(),
+                   probs = pRho(),
+                   lower = domain()[1],
+                   upper = domain()[2])
+  })
+  
+  output$cdf_rho <- renderPlot ({
+     
+      params <- distributionRho()$Normal
       mu <- params[1,1]
       sig <- params[1,2]
       
-      domain <- string_to_num_vector(input$domain)
-
-      curve(pnorm(x, mean = mu, sd = sig), from = domain[1], to = domain[2], 
+     
+      curve(pnorm(x, mean = mu, sd = sig), 
+            from = domain()[1], to = domain()[2], 
             main = "Cumulative Distribution Function", 
             xlab = "Treatment Effect", ylab = "Probability Density", lwd = 2)
       
-      points(c(v),pnorm(c(v),mean=mu,sd=sig), pch = 16, 
+      points(vRho(),pnorm(vRho(),mean=mu,sd=sig), pch = 16, 
              col = "black", cex = 1.5)
     })
     
     
     
+  
+  # Fit distribution to elicited judgements for S_t(0) ----
     
-    
-    
-    
-    
+  pS_t0 <-  reactive({
+    string_to_num_vector(input$cumulative_probs_beta)})
+  
+  vS_t0 <- reactive({
+    string_to_num_vector(input$surv_times)})
+  
+  
+    distributionS_t_0 <- reactive({
+      SHELF::fitdist(vals = vS_t0(),
+                     probs = pS_t0(), lower = 0, upper = 1)
+    })
     
     # Constructs a prior probability distribution for the survival times s(t)
     output$pdf_st <- renderPlot({
       
-      p <- string_to_num_vector(input$cumulative_probs_beta)
-      v <- string_to_num_vector(input$surv_times)
-      
-      params <- SHELF::fitdist(vals = v, probs = p, lower = 0, upper = 1)$Beta
+      params <- distributionS_t_0()$Beta
       alpha <- params[1,1]
       beta <- params[1,2]
       
@@ -236,11 +260,11 @@ server <- function(input, output) {
             main = sprintf("Beta Density Function (alpha = %.2f, beta = %.2f)", alpha, beta), 
             xlab = "Survival Time", ylab = "Probability Density", lwd = 2)
       
-      cord.x <- c(0,seq(0,v[1],0.005),v[1]) 
-      cord.y <- c(0,dbeta(seq(0,v[1],0.005), shape1 = alpha, shape2 = beta)-1/10^3,0)
+      cord.x <- c(0,seq(0,vS_t0()[1],0.005),vS_t0()[1]) 
+      cord.y <- c(0,dbeta(seq(0,vS_t0()[1],0.005), shape1 = alpha, shape2 = beta)-1/10^3,0)
       polygon(cord.x, cord.y, col="lightcoral")
       
-      last <- tail(v, n=1)
+      last <- tail(vS_t0(), n=1)
       
       cord.x <- c(last,seq(last,1,0.005),1) 
       cord.y <- c(0,dbeta(seq(last,1,0.005), shape = alpha, shape2 = beta)-1/10^3,0)
@@ -252,10 +276,7 @@ server <- function(input, output) {
     
     output$cdf_st <- renderPlot ({
       
-      p <- string_to_num_vector(input$cumulative_probs_beta)
-      v <- string_to_num_vector(input$surv_times)
-      
-      params <- SHELF::fitdist(vals = v, probs = p, lower = 0, upper = 1)$Beta
+      params <- distributionS_t_0()$Beta
       alpha <- params[1,1]
       beta <- params[1,2]
       
@@ -263,7 +284,7 @@ server <- function(input, output) {
             main = "Cumulative Distribution Function", 
             xlab = "Treatment Effect", ylab = "Probability Density", lwd = 2)
       
-      points(v,pbeta(v,shape1=alpha,shape2=beta), pch = 16, 
+      points(vS_t0(),pbeta(vS_t0(),shape1=alpha,shape2=beta), pch = 16, 
              col = "black", cex = 1.5)
       
     })
@@ -273,6 +294,16 @@ server <- function(input, output) {
     })
     
     
+    lambdaSample <- reactive({
+      nS<- 10000
+      S1_t0 <- SHELF::sampleFit(distributionS_t_0, n = nS)[, "beta"]
+      rho <- SHELF::sampleFit(distributionRho, n = nS)[, "normal"]
+      S2_t0 <- S1_t0 + rho
+      check <- S2_t0 > 0 & S2_t0 < 1
+      lambda_control <- lambdas(S1_t0[check])
+      lambda_treat <- lambdas(S2_t0[check])
+      data.frame(lambda_control, lambda_treat)
+    })
     
     
     
@@ -336,4 +367,5 @@ server <- function(input, output) {
 }
 
 # Run shiny app ---------------------------
-shinyApp(ui = ui, server = server)
+shinyApp(ui = ui, server = server,
+         options = list(launch.browser = TRUE))

@@ -293,11 +293,12 @@ server <- function(input, output) {
       
     })
     
+    # Sample lambda parameters for control and treatment groups ----
     
     lambdaSample <- reactive({
       nS<- 10000
-      S1_t0 <- SHELF::sampleFit(distributionS_t_0, n = nS)[, "beta"]
-      rho <- SHELF::sampleFit(distributionRho, n = nS)[, "normal"]
+      S1_t0 <- SHELF::sampleFit(distributionS_t_0(), n = nS)[, "beta"]
+      rho <- SHELF::sampleFit(distributionRho(), n = nS)[, "normal"]
       S2_t0 <- S1_t0 + rho
       check <- S2_t0 > 0 & S2_t0 < 1
       lambda_control <- lambdas(S1_t0[check])

@@ -45,7 +45,7 @@ ui <- fluidPage(
                                                                    title = "Elicitation of survival rate \\(S_1(t_0)\\)",
                                                                    br(),
                                                                    fluidRow(
-                                                                            p("Here we elicit a distribution for the unknown quantity \\(S_1(t_0)\\), this is the survival rate of the control group in the clinical trial at time \\(t = t_0 \\).
+                                                                            p("Here we elicit a distribution for the unknown quantity \\(S_1(t_0)\\), this is the proportion of patients in the control group in the clinical trial who have survived until at least time \\(t = t_0 \\).
                                                                                In this elicitation we assume that the prior probability distribution for \\(S_1(t_0)\\) is a beta distribution with shape parameters
                                                                                dependent upon the beliefs and judgements proposed by the expert of the clinical trial."),
 
@@ -86,12 +86,12 @@ ui <- fluidPage(
                                                                    br(),
                                                                    fluidRow(
                                                                              p("Here we elicit a distribution for the treatment effect difference \\(\\rho\\),
-                                                                                that is the difference in the survival time
-                                                                                between the control and experimental group. A positive observation for \\(\\rho\\) would
-                                                                                indicate a difference in favor of the treatment whereas a negative observation
+                                                                                that is the difference in the proportion surving at time \\(t_0\\)
+                                                                                between the treatment and control group. A positive value for \\(\\rho\\) would
+                                                                                indicate a difference in favour of the treatment whereas a negative observation
                                                                                 would indicate a difference in favor of the standard treatment recieved by the control group.
-                                                                                It is assumed that this unknown value follows a normal distribution with mean and
-                                                                                varience dependent upon the beliefs and judgements proposed by the expert
+                                                                                It is assumed that uncertainty about this value can be represented a (truncated) normal distribution with mean and
+                                                                                variance dependent upon the beliefs and judgements proposed by the expert
                                                                                 of the clinical trial."),
                                                                                 
                                                                               p("The application seen below is an elicitation tool which derives a prior probability distribution for the unknown
@@ -129,7 +129,7 @@ ui <- fluidPage(
                                                                    br(),
                                                                    fluidRow(
                                                                      
-                                                                     p("This tab displays feedback on the survival proportions in each of the treatment groups at some particular time in the trial. 
+                                                                     p("This tab displays feedback on the survival proportions in each of the treatment and control group at some particular time in the trial. 
                                                                        The survival feedback visualised below is a direct consequence of the 
                                                                        beliefs and judgements the user elicited about the observable quantities in the previous tabs. The user is 
                                                                        required to enter a time point into the trial e.g. 2 years, then using the simulated data the user can judge 
@@ -226,7 +226,9 @@ ui <- fluidPage(
                            tabPanel(
                                     title = "About",
                                     fluidPage(
-                                      p("This app implements the methodology seen in Ren & oakley, S.R.&.J.E.O. 2013. Assurance calculations for planning clinical trials with time-to-event outcomes. [Online]. [15 June 2021]. Available from: ", tags$a(href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4280895/", "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4280895/", target="_blank"), "." 
+                                      p("This app implements the methodology in Ren, S. and Oakley, J. E. (2014).",
+                                        tags$a(href="http://onlinelibrary.wiley.com/doi/10.1002/sim.5916/full", "Assurance calculations for planning clinical trials with time-to-event outcomes,", target="_blank"),
+                                        "Statistics in Medicine 33(1), 31-45."
                                         ),
                                       p("This was the final result of the SURE (Summer Undergraduate Research Experience) produced by Bradley M Howard under supervision and aid of Professor Jeremy E Oakley", "(see", tags$a(href="http://www.jeremy-oakley.staff.shef.ac.uk/", "http://www.jeremy-oakley.staff.shef.ac.uk/", target="_blank"), ")", "at the University of sheffield.
                                         ")

@@ -129,14 +129,14 @@ ui <- fluidPage(
                                                                    br(),
                                                                    fluidRow(
                                                                      
-                                                                     p("This tab displays feedback on the survival proportions in each of the treatment and control group at some particular time in the trial. 
+                                                                     p("This tab displays a sample from the joint distribution of the proportion surviving
+                                                                     in each of the treatment and control group at some particular time in the trial.
+                                                                     The user is required to enter this time point, e.g. 2 years, and this can be different from the time point 
+                                                                       \\(t_0\\) used in the elicitation.
                                                                        The survival feedback visualised below is a direct consequence of the 
-                                                                       beliefs and judgements the user elicited about the observable quantities in the previous tabs. The user is 
-                                                                       required to enter a time point into the trial e.g. 2 years, then using the simulated data the user can judge 
-                                                                       whether the treatment is effective after the specified time since the trial started. If the user elicited the 
-                                                                       treatment to have a positive effect on the experimental group then they should observe that the population mean
-                                                                       within the control group is lower than the experimental group, that is the points on the scatter plot are more abundant above the 
-                                                                       line of \\(y = x \\) than below.")
+                                                                       beliefs and judgements the user elicited about the observable quantities in the previous tabs.
+                                                                       The scatter plot illustrates the dependence between these two proportions. 
+                                                                       The dashed lines indicate the median and a 95% interval from each marginal distribution.")
                                                                      
                                                                    ),
                                                                    
